@@ -1,0 +1,1 @@
+$ token=<SLACK-BOT-TOKEN> node run.js
