@@ -1,15 +1,13 @@
 var request = require('request');
 var util = require('util');
 
-var HTTP_REQUEST = {
-  headers: {
-    'x-api-key': "PkVRKmPu0k6O2F0Y9J78TaFekqe3mAAe3RWJ5Vaj"
-  }
-}
-
 var api = {
-  url: "https://8kdx6rx8h4.execute-api.us-east-1.amazonaws.com",
+  host: "https://d735s5r2zljbo.cloudfront.net",
   limit: 5,
+  
+  request: {
+    headers: {'user-agent': 'bitbucket.org/agustinbv/apu'}
+  },
 
   promise: function(req) {
     return new Promise((resolve, reject) => {
@@ -25,15 +23,15 @@ var api = {
   },
 
   buscar: function(str, lat, lng) {
-    var req = util._extend(HTTP_REQUEST, {
-      url: util.format("%s/prod/productos?string=%s&lat=%s&lng=%s&limit=%s", this.url, str, lat, lng, this.limit)
+    var req = util._extend(this.request, {
+      url: util.format("%s/prod/productos?string=%s&lat=%s&lng=%s&limit=%s", this.host, str, lat, lng, this.limit)
     })
     return this.promise(req)
   },
 
   producto: function(id, lat, lng) {
-    var req = util._extend(HTTP_REQUEST, {
-      url: util.format("%s/prod/producto?id_producto=%s&lat=%s&lng=%s&limit=%s", this.url, id, lat, lng, this.limit)
+    var req = util._extend(this.request, {
+      url: util.format("%s/prod/producto?id_producto=%s&lat=%s&lng=%s&limit=%s", this.host, id, lat, lng, this.limit)
     })
     return this.promise(req)
   },
