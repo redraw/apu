@@ -4,13 +4,14 @@ var util = require('util');
 var api = {
   host: "https://d735s5r2zljbo.cloudfront.net",
   limit: 5,
-  
-  request: {
+
+  defaults: {
     headers: {'user-agent': 'bitbucket.org/agustinbv/apu'}
   },
 
-  promise: function(req) {
+  request: function(payload) {
     return new Promise((resolve, reject) => {
+      var req = Object.assign({}, this.defaults, payload)
       request(req, function(err, res, body) {
         if (err || res.statusCode !== 200) {
           console.log(err, res)
@@ -23,21 +24,25 @@ var api = {
   },
 
   buscar: function(str, lat, lng) {
-    var req = util._extend(this.request, {
-      url: util.format("%s/prod/productos?string=%s&lat=%s&lng=%s&limit=%s", this.host, str, lat, lng, this.limit)
-    })
-    return this.promise(req)
+    var payload = {
+      url: `${this.host}/prod/productos?string=${str}&lat=${lat}&lng=${lng}&limit=${this.limit}`
+    }
+    return this.request(payload)
   },
 
   producto: function(id, lat, lng) {
-    var req = util._extend(this.request, {
-      url: util.format("%s/prod/producto?id_producto=%s&lat=%s&lng=%s&limit=%s", this.host, id, lat, lng, this.limit)
-    })
-    return this.promise(req)
+    var payload = {
+      url: `${this.host}/prod/producto?id_producto=${id}&lat=${lat}&lng=${lng}&limit=${this.limit}`
+    }
+    return this.request(payload)
   },
 
   img: function(id) {
-    return util.format("https://imagenes.preciosclaros.gob.ar/productos/%s.jpg", id)
+    return `https://imagenes.preciosclaros.gob.ar/productos/${id}.jpg`
+  },
+
+  permalink: function(id, lat, lng) {
+    return `https://www.preciosclaros.gob.ar/?producto=${id}&lat=${lat}&lng=${lng}`
   }
 }
 
