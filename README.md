@@ -1,6 +1,6 @@
 ```
 $ npm install
-$ SLACK_TOKEN=<SLACK-TOKEN> node run.js
+$ SLACK_TOKEN=<SLACK-TOKEN> LAT=<LAT> LNG=<LNG> node run.js
 ```
 
 
