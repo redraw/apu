@@ -17,9 +17,8 @@ bot = controller.spawn({
 }).startRTM()
 
 var location = {
-  lat: '-34.9138008',
-  lng: '-57.9593571',
-  name: 'Calle 43 915, Buenos Aires, Argentina'
+  lat: process.env.LAT,
+  lng: process.env.LNG,
 }
 
 var EVENTS = {
