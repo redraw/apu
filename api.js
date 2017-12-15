@@ -1,5 +1,4 @@
 var request = require('request');
-var util = require('util');
 
 var api = {
   host: "https://d735s5r2zljbo.cloudfront.net",
@@ -25,7 +24,7 @@ var api = {
 
   buscar: function(str, lat, lng) {
     var payload = {
-      url: `${this.host}/prod/productos?string=${str}&lat=${lat}&lng=${lng}&limit=${this.limit}`
+      url: `${this.host}/prod/productos?string=${str}&lat=${lat}&lng=${lng}&limit=${this.limit}&sort=-cant_sucursales_disponible`
     }
     return this.request(payload)
   },
