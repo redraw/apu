@@ -9,8 +9,7 @@
   "author": "redraw",
   "license": "ISC",
   "dependencies": {
-    "botkit": "^0.2.2",
-    "geocoder": "^0.2.2",
+    "botkit": "^0.7.0",
     "request": "^2.74.0"
   }
 }

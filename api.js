@@ -13,10 +13,13 @@ var api = {
       var req = Object.assign({}, this.defaults, payload)
       request(req, function(err, res, body) {
         if (err || res.statusCode !== 200) {
-          console.log(err, res)
-          reject(err || body)
+          reject(err)
         }
         var data = JSON.parse(body);
+        if (data.status !== 200) {
+          console.log(data)
+          reject(data.errorDescription)
+        }
         resolve(data)
       })
     })

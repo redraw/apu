@@ -8,7 +8,7 @@ const server = http.createServer(
 
 var controller = Botkit.slackbot({
   debug: false,
-  retry: true
+  retry: Infinity
 });
 
 // connect the bot to a stream of messages
@@ -21,19 +21,16 @@ var location = {
   lng: process.env.LNG,
 }
 
-var EVENTS = {
-  default: ['direct_message', 'direct_mention', 'mention']
-}
-
 // patterns
-controller.hears('.*', EVENTS.default, buscar);
+controller.hears('.*', ['direct_message', 'direct_mention'], buscar);
 
 // actions
 function buscar(bot, message) {
-  console.log(message)
+  console.log(`[${message.user}] ${message.text}`)
   bot.reply(message, 'espere un momentos');
 
   api.buscar(message.match[0], location.lat, location.lng).then(data => {
+    console.log(data)
     var productos = data.productos.filter(p => p.cantSucursalesDisponible > 0);
 
     if (productos.length <= 0) {
@@ -51,15 +48,15 @@ function buscar(bot, message) {
         })
       })
     }
-  }, err => {
-    bot.reply(message, markupError(err));
+  }).catch(e => {
+    bot.reply(message, showError(e));
   });
 }
 
-function markupError(err) {
+function showError(err) {
   return {
     "attachments": [{
-      "title": "error!",
+      "title": "ERROR",
       "color": "danger",
       "text": err
     }]
