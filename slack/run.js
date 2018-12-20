@@ -1,12 +1,12 @@
-var Botkit = require('botkit');
-var api = require('./api.js')
+const Botkit = require('botkit');
+const api = require('./api')
 
 const http = require('http')
 const server = http.createServer(
   (req, res) => res.end('ok')
 )
 
-var controller = Botkit.slackbot({
+const controller = Botkit.slackbot({
   debug: false,
   retry: Infinity
 });
@@ -16,7 +16,7 @@ bot = controller.spawn({
   token: process.env.SLACK_TOKEN,
 }).startRTM()
 
-var location = {
+const location = {
   lat: process.env.LAT,
   lng: process.env.LNG,
 }
@@ -31,7 +31,7 @@ function buscar(bot, message) {
 
   api.buscar(message.match[0], location.lat, location.lng).then(data => {
     console.log(data)
-    var productos = data.productos.filter(p => p.cantSucursalesDisponible > 0);
+    const productos = data.productos.filter(p => p.cantSucursalesDisponible > 0);
 
     if (productos.length <= 0) {
       bot.reply(message, 'no results, vuelvas prontos')
