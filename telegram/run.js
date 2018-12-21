@@ -1,5 +1,6 @@
 const api = require('./api')
-const request = require('request')
+const barcode = require('./barcode')
+
 const Telegraf = require('telegraf')
 const Extra = require('telegraf/extra')
 const Markup = require('telegraf/markup')
@@ -17,7 +18,7 @@ bot.start(ctx => {
 bot.on('text', ctx => {
   ctx.reply('Espere un momentos')
   const {latitude, longitude} = ctx.session.location
-  
+
   api.buscar(ctx.message.text, latitude, longitude).then(data => {
     const productos = data.productos.filter(p => p.cantSucursalesDisponible > 0);
     if (productos.length <= 0) {
@@ -42,17 +43,27 @@ bot.on('location', ctx => {
 })
 
 bot.on('photo', ctx => {
+  ctx.reply('Espere un momentos')
   console.log('[photo]', ctx.message)
   const photo = ctx.message.photo.pop()
   ctx.telegram.getFileLink(photo.file_id).then(url => {
-    const decoder = `https://api.qrserver.com/v1/read-qr-code/`
-    request(`${decoder}?fileurl=${encodeURIComponent(url)}`, (err, res, body) => {
-      console.log(body)
+    barcode.reader.decode(url).then(code => {
+      const {latitude, longitude} = ctx.session.location
+      api.producto(code, latitude, longitude).then(data => {
+        const p = data.producto
+        const permalink = api.permalink(p.id, latitude, longitude)
+        ctx.replyWithMarkdown(`*${p.nombre}* [img](${api.img(p.id)}) | [link](${permalink})`)
+        let text = data.sucursales.map(s => {
+          const mapLink = `https://google.com/maps?q=${s.lat},${s.lng}`
+          return `[${s.banderaDescripcion}](${mapLink}) (${s.distanciaDescripcion}) $${s.preciosProducto.precioLista}`
+        }).join("\n")
+        ctx.replyWithMarkdown(text, {
+          disable_web_page_preview: true
+        })
+      })
+    }).catch(err => {
+      ctx.reply(err)
     })
-    // Jimp.read(url).then(image => {
-    //   const {data, width, height} = image.bitmap
-    //   const code = jsqr(data, width, height)
-    // })
   })
 })
 
@@ -61,7 +72,7 @@ function requestLocation() {
     if (ctx.message.text == '/start' || ctx.session.location || ctx.message.location) {
       return next(ctx)
     } else {
-      return ctx.reply('Necesitos su ubicación para buscar precios cercas suyo', 
+      return ctx.reply('Necesitos su ubicación para buscar precios cercas suyo',
         Extra.markup(markup => {
           return markup.oneTime().resize()
             .keyboard([markup.locationRequestButton('Enviar ubicación')])

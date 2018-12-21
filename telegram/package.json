@@ -4,6 +4,7 @@
   "description": "",
   "main": "run.js",
   "dependencies": {
+    "jimp": "^0.6.0",
     "request": "^2.88.0",
     "telegraf": "^3.25.5"
   },
