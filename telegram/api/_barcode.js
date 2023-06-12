@@ -6,9 +6,9 @@ var reader = {
       request.post("https://zxing.org/w/decode?full=false", {
         formData: {f: request.get(url, {encoding: null})}
       }, (err, res, body) => {
-        console.log(body)
+        console.log('[barcode]', body)
         if (err || res.statusCode !== 200) {
-          reject("No se pudo escanear el código")
+          reject("Mi escaner no funciona muy bien, intente de nuevos con una mejor toma")
         } else {
           resolve(body.trim())
         }

@@ -2,16 +2,18 @@
   "name": "apu",
   "version": "1.0.0",
   "description": "",
-  "main": "run.js",
+  "main": "index.js",
   "dependencies": {
+    "install": "^0.13.0",
     "jimp": "^0.6.0",
+    "npm": "^9.7.1",
     "request": "^2.88.0",
-    "telegraf": "^3.25.5"
+    "telegraf": "^3.25.5",
+    "telegraf-session-redis": "^5.1.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node run.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC"

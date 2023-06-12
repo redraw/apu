@@ -1,11 +1,14 @@
-var request = require('request');
+var request = require('request')
 
 var api = {
   host: "https://d735s5r2zljbo.cloudfront.net",
-  limit: 5,
 
   defaults: {
-    headers: {'user-agent': 'bitbucket.org/agustinbv/apu'}
+    headers: {
+      'user-agent': 'Mozilla/5.0 (compatible; MSIE 8.0; Windows NT 5.1; Win64; x64; Trident/4.0)',
+      'x-api-key': 'zIgFou7Gta7g87VFGL9dZ4BEEs19gNYS1SOQZt96',
+      'referer': 'https://preciosclaros.gob.ar',
+    }
   },
 
   request: function(payload) {
@@ -13,6 +16,7 @@ var api = {
       var req = Object.assign({}, this.defaults, payload)
       request(req, function(err, res, body) {
         if (err || res.statusCode !== 200) {
+          console.error(err, res)
           reject(err)
         }
         var data = JSON.parse(body);
@@ -25,16 +29,35 @@ var api = {
     })
   },
 
-  buscar: function(str, lat, lng) {
+  _encodeParams: function(params) {
+    return Object.entries(params).map(kv => kv.map(encodeURIComponent).join('=')).join('&')
+  },
+
+  buscar: function(q, lat, lng, offset = 0, limit = 5) {
+    const params = this._encodeParams({
+      string: q,
+      lat,
+      lng,
+      offset,
+      limit,
+      sort: '-cant_sucursales_disponible'
+    })
     var payload = {
-      url: `${this.host}/prod/productos?string=${str}&lat=${lat}&lng=${lng}&limit=${this.limit}&sort=-cant_sucursales_disponible`
+      url: `${this.host}/prod/productos?${params}`
     }
     return this.request(payload)
   },
 
-  producto: function(id, lat, lng) {
+  producto: function(id, lat, lng, limit = 5) {
+    const params = this._encodeParams({
+      id_producto: id,
+      lat,
+      lng,
+      limit,
+    })
+
     var payload = {
-      url: `${this.host}/prod/producto?id_producto=${id}&lat=${lat}&lng=${lng}&limit=${this.limit}`
+      url: `${this.host}/prod/producto?${params}`
     }
     return this.request(payload)
   },
