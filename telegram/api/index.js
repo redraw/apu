@@ -16,6 +16,10 @@ const session = new RedisSession({
 bot.use(session)
 bot.use(location())
 
+bot.catch((err, ctx) => {
+  console.error('[bot error]', err)
+})
+
 bot.start(async ctx => {
   await ctx.replyWithMarkdown('Buenos dias ✌')
 })
@@ -26,6 +30,7 @@ bot.command('ubicacion', ctx => {
 
 bot.on('text', async ctx => {
   await ctx.replyWithChatAction('typing')
+  if (!ctx.session.location) return requestLocation(ctx)
   const {latitude, longitude} = ctx.session.location
   return api.buscar(ctx.message.text, latitude, longitude).then(async data => {
     console.log('[buscar]', data)
@@ -42,6 +47,8 @@ bot.on('text', async ctx => {
         })
       )
     }
+  }).catch(err => {
+    return ctx.reply(err && err.message || String(err))
   })
 })
 
@@ -65,14 +72,15 @@ bot.on('photo', async ctx => {
     return barcode.reader.decode(url).then(code => {
       return replyWithProduct(ctx, code)
     }).catch(err => {
-      return ctx.reply(err)
+      return ctx.reply(err && err.message || String(err))
     })
   }).catch(err => {
-    return ctx.reply(err)
+    return ctx.reply(err && err.message || String(err))
   })
 })
 
 async function replyWithProduct(ctx, code) {
+  if (!ctx.session.location) return requestLocation(ctx)
   const {latitude, longitude} = ctx.session.location
   return api.producto(code, latitude, longitude).then(async data => {
     if (data.total === 0) {
@@ -99,10 +107,10 @@ async function replyWithProduct(ctx, code) {
       if (err.response.description.includes("IMAGE_PROCESS_FAILED")) {
         return ctx.replyWithMarkdown(text, { disable_web_page_preview: true })
       }
-      return ctx.reply(err)
+      return ctx.reply(err && err.message || String(err))
     })
   }).catch(err => {
-    return ctx.reply(err)
+    return ctx.reply(err && err.message || String(err))
   })
 }
 
@@ -139,6 +147,6 @@ export default async function handler(request, response) {
     return response.status(200).send('OK')
   } catch (error) {
     console.error(error)
-    return response.status(500).send('Error')
+    return response.status(200).send('OK')
   }
 }

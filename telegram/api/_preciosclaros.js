@@ -1,7 +1,7 @@
 var request = require('request')
 
 var api = {
-  host: "https://d735s5r2zljbo.cloudfront.net",
+  host: "https://d3e6htiiul5ek9.cloudfront.net",
 
   defaults: {
     headers: {
@@ -17,12 +17,12 @@ var api = {
       request(req, function(err, res, body) {
         if (err || res.statusCode !== 200) {
           console.error(err, res)
-          reject(err)
+          return reject(err || new Error(`Request failed with status ${res && res.statusCode}`))
         }
         var data = JSON.parse(body);
         if (data.status !== 200) {
           console.log(data)
-          reject(data.errorDescription)
+          return reject(new Error(data.errorDescription || `API error status ${data.status}`))
         }
         resolve(data)
       })
